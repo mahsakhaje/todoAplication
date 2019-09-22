@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TodoFragment"
+
+
+    >
+
+
+   <androidx.recyclerview.widget.RecyclerView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/todoRecycleerView"/>
+   <com.google.android.material.floatingactionbutton.FloatingActionButton
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_alignParentBottom="true"
+android:id="@+id/addtodo_botton"
+       android:layout_marginStart="10dp"
+       android:layout_marginLeft="10dp"
+       android:layout_marginTop="10dp"
+       android:layout_marginEnd="10dp"
+       android:layout_marginRight="10dp"
+       android:layout_marginBottom="10dp"
+       android:src="@android:drawable/ic_input_add"></com.google.android.material.floatingactionbutton.FloatingActionButton>
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:orientation="vertical"
+    android:id="@+id/linearlayot"
+
+
+    >
+   <LinearLayout
+       android:layout_width="149dp"
+       android:layout_height="190dp"
+       android:background="@drawable/notebook"
+       android:orientation="horizontal">
+
+   </LinearLayout>
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="there is no task to show"
+       android:textColor="#000"
+      ></TextView>
+
+</LinearLayout>
+
+
+
+
+</RelativeLayout>
