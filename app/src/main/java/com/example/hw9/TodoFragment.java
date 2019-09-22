@@ -121,6 +121,7 @@ public class TodoFragment extends Fragment {
         public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
             holder.title.setText(repository.get(position).getTitle());
             holder.time.setText((CharSequence) repository.get(position).getDate());
+
         }
 
         @Override
