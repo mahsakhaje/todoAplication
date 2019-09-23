@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,9 @@ public class TodoFragment extends Fragment {
     MyAdaptor adaptor;
     RepositoryToDo repository;
     FloatingActionButton addTodoTask;
+    LinearLayout backGroundLayout;
+    boolean hide;
+
 
     public TodoFragment() {
         // Required empty public constructor
@@ -62,34 +66,31 @@ public class TodoFragment extends Fragment {
         addTodoTask = (FloatingActionButton) v.findViewById(R.id.addtodo_botton);
         myRecyclerView = v.findViewById(R.id.todoRecycleerView);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        task=new TaskTodo();
-        repository = RepositoryToDo.getInstance(task);
 
+        task = new TaskTodo();
+        repository = RepositoryToDo.getInstance(task);
+        backGroundLayout = v.findViewById(R.id.linearlayot);
         adaptor = new MyAdaptor(repository.getTasks());
         myRecyclerView.setAdapter(adaptor);
-        task = new TaskTodo();
+
 
         addTodoTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogAddTask fragment = DialogAddTask.newInstance();
+                DialogAddTask fragment = DialogAddTask.newInstance(task);
                 fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
                 fragment.show(getFragmentManager(), "tag");
+
             }
         });
         return v;
     }
 
-    public void setTitleAndDescription(String title, String description) {
-        task.setTitle(title);
-        task.setDescription(description);
-    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         TextView title;
         TextView time;
-
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -126,7 +127,22 @@ public class TodoFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return repository.size()-1;
+            return repository.size();
         }
     }
+
+    public void updateTask(TaskTodo task) {
+
+
+        hide = true;
+        if (hide) {
+            backGroundLayout.setVisibility(View.INVISIBLE);
+        }
+        repository.addTask(task);
+        adaptor.notifyDataSetChanged();
+
+
+    }
+
+
 }
