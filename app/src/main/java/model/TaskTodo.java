@@ -1,14 +1,24 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
-public class TaskTodo {
-    private  String title;
+public class TaskTodo implements Serializable {
+    private String title;
     private String description;
     private Date date;
     private Date time;
+    private UUID ID;
 
-    public String  getTitle() {
+    public UUID getID() {
+        return ID;
+    }
+
+   public TaskTodo(){
+    ID=UUID.randomUUID();
+}
+    public String getTitle() {
         return title;
     }
 

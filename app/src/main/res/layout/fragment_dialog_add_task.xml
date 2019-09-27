@@ -6,6 +6,65 @@
     android:layout_height="match_parent"
     tools:context=".DialogAddTask">
 
+    <Button
+        android:id="@+id/button_choose_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/radiogroop"
+        android:text="choose a time"></Button>
+
+    <Button
+        android:id="@+id/button_coose_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_choose_time"
+        android:text="choose a date"></Button>
+
+    <EditText
+        android:id="@+id/edittext_title_dialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titleTextView_dialog"
+
+        android:layout_margin="10dp">
+
+    </EditText>
+
+    <EditText
+        android:id="@+id/editText_decription_dialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/descriptionTextView_dialog"
+
+        android:layout_margin="10dp"></EditText>
+
+    <RadioGroup
+        android:id="@+id/radiogroop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editText_decription_dialog"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/todoRadioBTN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TODO" />
+
+        <RadioButton
+            android:id="@+id/doingRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DOING" />
+
+        <RadioButton
+            android:id="@+id/doneRadioBTN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DONE" />
+
+    </RadioGroup>
+
     <TextView
         android:id="@+id/titleTextView_dialog"
         android:layout_width="wrap_content"
@@ -16,45 +75,16 @@
 
 
     </TextView>
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:id="@+id/edittext_title_dialog"
 
-        android:layout_below="@id/titleTextView_dialog"
-        >
-
-    </EditText>
     <TextView
         android:id="@+id/descriptionTextView_dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/edittext_title_dialog"
         android:layout_margin="10dp"
         android:text="description : "
-        android:layout_below="@id/edittext_title_dialog"
         android:textColor="#000">
 
 
     </TextView>
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:id="@+id/editText_decription_dialog"
-
-        android:layout_below="@id/descriptionTextView_dialog"
-        ></EditText>
-    <Button
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-        android:id="@+id/button_choose_time"
-    android:layout_below="@id/editText_decription_dialog"
-    ></Button>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/button_coose_date"
-        android:layout_below="@id/button_choose_time"
-        ></Button>
 </RelativeLayout>
