@@ -14,7 +14,7 @@
         android:text="choose a time"></Button>
 
     <Button
-        android:id="@+id/button_coose_date"
+        android:id="@+id/button_choose_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/button_choose_time"

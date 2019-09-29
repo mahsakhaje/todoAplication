@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class RepositoryToDo {
     private TaskTodo task;
@@ -28,8 +29,11 @@ public class RepositoryToDo {
         return tasks.get(index);
     }
 
-    public void removeTask(int index) {
-        tasks.remove(index);
+    public void removeTask(UUID uuid) {
+       for (TaskTodo taskk:tasks){
+           if(taskk.getID()==uuid)
+               tasks.remove(task);
+       }
     }
 
     public List<TaskTodo> getTasks() {

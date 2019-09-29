@@ -1,5 +1,7 @@
 package model;
 
+import com.example.hw9.States;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
@@ -10,14 +12,24 @@ public class TaskTodo implements Serializable {
     private Date date;
     private Date time;
     private UUID ID;
+    private States taskState;
+
+    public States getTaskState() {
+        return taskState;
+    }
+
+    public void setTaskState(States taskState) {
+        this.taskState = taskState;
+    }
 
     public UUID getID() {
         return ID;
     }
 
-   public TaskTodo(){
-    ID=UUID.randomUUID();
-}
+    public TaskTodo() {
+        ID = UUID.randomUUID();
+    }
+
     public String getTitle() {
         return title;
     }
