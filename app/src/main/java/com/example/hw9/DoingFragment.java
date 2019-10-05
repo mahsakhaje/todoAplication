@@ -42,6 +42,7 @@ public class DoingFragment extends Fragment {
     MyAdapter adapter;
     RepositoryDoing repository;
     LinearLayout backGroundLayout;
+    boolean change;
 
     public DoingFragment() {
         // Required empty public constructor
@@ -87,6 +88,7 @@ public class DoingFragment extends Fragment {
         TextView title;
         TextView time;
         TextView description;
+        LinearLayout linearLayout;
 
         public ViewHolderDoing(@NonNull View itemView) {
             super(itemView);
@@ -94,6 +96,7 @@ public class DoingFragment extends Fragment {
             time = itemView.findViewById(R.id.timeTextView_Item_View);
             title = itemView.findViewById(R.id.textviewtitle_todo);
             description = itemView.findViewById(R.id.description_item_todo);
+            linearLayout=itemView.findViewById(R.id.parent_layout);
         }
     }
 
@@ -115,7 +118,7 @@ public class DoingFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewHolderDoing holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolderDoing holder, final int position) {
             holder.title.setText(repositoryList.get(position).getTitle());
             if (repositoryList.get(position).getTime() != null) {
                 Date date = repositoryList.get(position).getTime();
@@ -123,6 +126,21 @@ public class DoingFragment extends Fragment {
                 holder.time.setText(format.format(date));
             }
             holder.description.setText(repositoryList.get(position).getDescription());
+            holder.linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogAddTask fragment = DialogAddTask.newInstance(repository.getTask(position));
+                    fragment.setTargetFragment(DoingFragment.this, REQUEST_CODE);
+                    fragment.show(getFragmentManager(), "tag21");
+                    if(change) {
+                        RepositoryDoing.getInstance(repository.getTask(position)).removeTask(position);
+                        adapter.notifyDataSetChanged();
+                    }
+                    change=false;
+
+                }
+
+            });
 
 
         }
@@ -135,6 +153,7 @@ public class DoingFragment extends Fragment {
 
 
     public void updateTask(TaskTodo task) {
+        change=true;
         if (task.getTaskState() == States.TODO) {
 
             RepositoryToDo repositoryTodo = RepositoryToDo.getInstance(task);

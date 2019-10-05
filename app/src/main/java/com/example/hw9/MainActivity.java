@@ -45,6 +45,7 @@ class myViewPager extends FragmentPagerAdapter {
         switch (position){
             case 0:
                 fragment=TodoFragment.newInstance();
+
                 break;
             case 1:
                 fragment=DoingFragment.newInstance();

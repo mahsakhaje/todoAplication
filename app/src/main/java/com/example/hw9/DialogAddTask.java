@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
 
+import model.RepositoryToDo;
 import model.TaskTodo;
 
 
@@ -63,15 +64,32 @@ public class DialogAddTask extends DialogFragment {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_dialog_add_task, null, false);
 
         View viewMain = LayoutInflater.from(getActivity()).inflate(R.layout.main_activity, null, false);
-        task = new TaskTodo();
-        task = (TaskTodo) getArguments().getSerializable(SENDED_TASK);
-
         title = v.findViewById(R.id.edittext_title_dialog);
         doing = v.findViewById(R.id.doingRadioButton);
         todo = v.findViewById(R.id.todoRadioBTN);
         done = v.findViewById(R.id.doneRadioBTN);
+        description = v.findViewById(R.id.editText_decription_dialog);
+
         viewPager = viewMain.findViewById(R.id.viewPagerContainor);
         addTime = v.findViewById(R.id.button_choose_time);
+        addDate = v.findViewById(R.id.button_choose_date);
+
+        task = (TaskTodo) getArguments().getSerializable(SENDED_TASK);
+        if (task.getDescription()!=null ||task.getTitle()!=null) {
+            title.setText(task.getTitle());
+            description.setText(task.getDescription());
+            if (task.getTime() != null) {
+                addTime.setText(task.getTime().toString());
+
+            }
+            if (task.getDate() != null) {
+                addTime.setText(task.getDate().toString());
+
+            }
+
+        } else {
+            task = new TaskTodo();
+        }
         addTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,11 +100,6 @@ public class DialogAddTask extends DialogFragment {
             }
         });
 
-        description = v.findViewById(R.id.editText_decription_dialog);
-        if (task.getTitle() != null) {
-            title.setText(task.getTitle().toString());
-            description.setText(task.getDescription().toString());
-        }
 
         doing.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +120,6 @@ public class DialogAddTask extends DialogFragment {
             }
         });
 
-        addDate = v.findViewById(R.id.button_choose_date);
         addDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,7 +132,6 @@ public class DialogAddTask extends DialogFragment {
         builder.setView(v).setPositiveButton("ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
 
                 if (!(title.getText().toString().isEmpty()) || !(description.getText().toString().isEmpty())) {
 
@@ -143,7 +154,7 @@ public class DialogAddTask extends DialogFragment {
 
 
                 }
-                //
+
                 else if (title.getText().toString().isEmpty() || description.getText().toString().isEmpty()) {
                     Toast.makeText(getActivity(), "you can not have empty task", Toast.LENGTH_LONG).show();
 
@@ -151,7 +162,8 @@ public class DialogAddTask extends DialogFragment {
             }
 
 
-        }).setNegativeButton("back", null);
+        });
+        builder.setNegativeButton("back",null);
 
 
         return builder.setView(v).create();

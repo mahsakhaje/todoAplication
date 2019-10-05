@@ -1,6 +1,7 @@
 package com.example.hw9;
 
 
+import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -41,7 +42,7 @@ public class DoneFragment extends Fragment {
     MyAdapter adapter;
     RepositoryDone repository;
     LinearLayout backGroundLayout;
-
+boolean change;
     public DoneFragment() {
         // Required empty public constructor
     }
@@ -88,12 +89,14 @@ public class DoneFragment extends Fragment {
         TextView title;
         TextView time;
         TextView description;
+        LinearLayout linearLayout;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             time = itemView.findViewById(R.id.timeTextView_Item_View);
             title = itemView.findViewById(R.id.textviewtitle_todo);
             description = itemView.findViewById(R.id.description_item_todo);
+            linearLayout=itemView.findViewById(R.id.parent_layout);
         }
     }
 
@@ -117,14 +120,31 @@ public class DoneFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
             holder.title.setText(repositoryList.get(position).getTitle());
+            holder.title.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
             if (repositoryList.get(position).getTime() != null) {
                 Date date = repositoryList.get(position).getTime();
                 DateFormat format = new SimpleDateFormat("HH:mm");
                 holder.time.setText(format.format(date));
             }
             holder.description.setText(repositoryList.get(position).getDescription());
+            holder.linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogAddTask fragment = DialogAddTask.newInstance(repository.getTask(position));
+                    fragment.setTargetFragment(DoneFragment.this, REQUEST_CODE);
+                    fragment.show(getFragmentManager(), "tag9");
+                    if(change) {
+                        RepositoryDone.getInstance(repository.getTask(position)).removeTask(position);
+                        adapter.notifyDataSetChanged();
+                    }
+                    change=false;
+
+                }
+
+
+            });
 
         }
 
@@ -136,6 +156,7 @@ public class DoneFragment extends Fragment {
     }
 
     public void updateTask(TaskTodo task) {
+        change=true;
         if (task.getTaskState() == States.TODO) {
 
             RepositoryToDo repositoryTodo = RepositoryToDo.getInstance(task);

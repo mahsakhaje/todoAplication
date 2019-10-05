@@ -35,6 +35,9 @@ public class RepositoryToDo {
                tasks.remove(task);
        }
     }
+    public void removeTask(int index){
+        tasks.remove(index);
+    }
 
     public List<TaskTodo> getTasks() {
         return tasks;

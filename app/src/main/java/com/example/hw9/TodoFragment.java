@@ -50,6 +50,7 @@ public class TodoFragment extends Fragment {
     FloatingActionButton addTodoTask;
     LinearLayout backGroundLayout;
     boolean hide;
+    boolean change=false;
 
 
     public TodoFragment() {
@@ -71,7 +72,7 @@ public class TodoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(DoingFragment.TAG,"onCreateTODO");
+        Log.d(DoingFragment.TAG, "onCreateTODO");
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_todo, container, false);
         addTodoTask = (FloatingActionButton) v.findViewById(R.id.addtodo_botton);
@@ -102,20 +103,22 @@ public class TodoFragment extends Fragment {
         TextView title;
         TextView time;
         TextView description;
+        LinearLayout linearLayout;
 
         public MyViewHolder(@NonNull final View itemView) {
             super(itemView);
             time = itemView.findViewById(R.id.timeTextView_Item_View);
             title = itemView.findViewById(R.id.textviewtitle_todo);
             description = itemView.findViewById(R.id.description_item_todo);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DialogAddTask fragment = DialogAddTask.newInstance(repository.getTask(adaptor.getIndex()));
-                    fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
-                    fragment.show(getFragmentManager(), "tag7");
-                }
-            });
+            linearLayout = itemView.findViewById(R.id.parent_layout);
+//            itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                      DialogAddTask fragment = DialogAddTask.newInstance(task);
+//                    fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
+//                    fragment.show(getFragmentManager(), "tag7");
+//                }
+//            });
 
         }
     }
@@ -144,7 +147,7 @@ public class TodoFragment extends Fragment {
 
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
         @Override
-        public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
             index = position;
             holder.title.setText(repository.get(position).getTitle());
             if (repository.get(position).getTime() != null) {
@@ -153,8 +156,22 @@ public class TodoFragment extends Fragment {
                 holder.time.setText(format.format(date));
             }
             holder.description.setText(repository.get(position).getDescription());
+            holder.linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogAddTask fragment = DialogAddTask.newInstance(repository.get(position));
+                    fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
+                   fragment.show(getFragmentManager(), "tag7");
+                   if(change) {
+                       RepositoryToDo.getInstance(repository.get(position)).removeTask(position);
+                       adaptor.notifyDataSetChanged();
+                   }
+                   change=false;
 
+                }
+            });
         }
+
 
         @Override
         public int getItemCount() {
@@ -163,36 +180,33 @@ public class TodoFragment extends Fragment {
     }
 
     public void updateTask(TaskTodo task) {
+        change=true;
         if (task.getTaskState() == States.TODO) {
             repository.addTask(task);
 
             adaptor.notifyDataSetChanged();
             if (repository.getTasks().size() > 0) {
-                backGroundLayout.setVisibility(View.INVISIBLE);}
-        }else
-        if (task.getTaskState() == States.DONE) {
-            RepositoryDone repositoryDone=RepositoryDone.getInstance(task);
+                backGroundLayout.setVisibility(View.INVISIBLE);
+            }
+        } else if (task.getTaskState() == States.DONE) {
+            RepositoryDone repositoryDone = RepositoryDone.getInstance(task);
             repositoryDone.addTask(task);
 
 
-        }else
-        if (task.getTaskState() == States.DOING) {
+        } else if (task.getTaskState() == States.DOING) {
             RepositoryDoing repositoryDoing = RepositoryDoing.getInstance(task);
             repositoryDoing.addTask(task);
 
 
-
-
-
-
-
+        } else {
+            repository.addTask(task);
+            adaptor.notifyDataSetChanged();
+            if (repository.getTasks().size() > 0) {
+                backGroundLayout.setVisibility(View.INVISIBLE);
+            }
         }
-        else{ repository.addTask(task);
-        adaptor.notifyDataSetChanged();
-        if (repository.getTasks().size() > 0) {
-            backGroundLayout.setVisibility(View.INVISIBLE);}}
 
-        }
+    }
 
     @Override
     public void onResume() {
