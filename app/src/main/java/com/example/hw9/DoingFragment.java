@@ -96,7 +96,7 @@ public class DoingFragment extends Fragment {
             time = itemView.findViewById(R.id.timeTextView_Item_View);
             title = itemView.findViewById(R.id.textviewtitle_todo);
             description = itemView.findViewById(R.id.description_item_todo);
-            linearLayout=itemView.findViewById(R.id.parent_layout);
+            linearLayout = itemView.findViewById(R.id.parent_layout);
         }
     }
 
@@ -132,11 +132,11 @@ public class DoingFragment extends Fragment {
                     DialogAddTask fragment = DialogAddTask.newInstance(repository.getTask(position));
                     fragment.setTargetFragment(DoingFragment.this, REQUEST_CODE);
                     fragment.show(getFragmentManager(), "tag21");
-                    if(change) {
+                    if (change) {
                         RepositoryDoing.getInstance(repository.getTask(position)).removeTask(position);
                         adapter.notifyDataSetChanged();
                     }
-                    change=false;
+                    change = false;
 
                 }
 
@@ -153,19 +153,28 @@ public class DoingFragment extends Fragment {
 
 
     public void updateTask(TaskTodo task) {
-        change=true;
+        change = true;
         if (task.getTaskState() == States.TODO) {
-
+            repository.removeTask(task.getID());
+            adapter.notifyDataSetChanged();
             RepositoryToDo repositoryTodo = RepositoryToDo.getInstance(task);
             repositoryTodo.addTask(task);
+            if (repository.getTasks().size() == 0) {
+                backGroundLayout.setVisibility(View.VISIBLE);
+            }
 
         } else if (task.getTaskState() == States.DONE) {
-            RepositoryDone done=RepositoryDone.getInstance(task);
+            repository.removeTask(task.getID());
+            adapter.notifyDataSetChanged();
+            RepositoryDone done = RepositoryDone.getInstance(task);
             done.addTask(task);
+            if (repository.getTasks().size() == 0) {
+                backGroundLayout.setVisibility(View.VISIBLE);
+            }
 
 
         } else if (task.getTaskState() == States.DOING) {
-            repository.addTask(task);
+            repository.updateTask(task);
             adapter.notifyDataSetChanged();
             if (repository.getTasks().size() > 0) {
                 backGroundLayout.setVisibility(View.INVISIBLE);
@@ -173,7 +182,7 @@ public class DoingFragment extends Fragment {
 
 
         } else {
-            repository.addTask(task);
+            repository.updateTask(task);
             adapter.notifyDataSetChanged();
             if (repository.getTasks().size() > 0) {
                 backGroundLayout.setVisibility(View.INVISIBLE);

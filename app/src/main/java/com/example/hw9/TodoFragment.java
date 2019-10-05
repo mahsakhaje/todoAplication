@@ -50,7 +50,7 @@ public class TodoFragment extends Fragment {
     FloatingActionButton addTodoTask;
     LinearLayout backGroundLayout;
     boolean hide;
-    boolean change=false;
+    boolean change = false;
 
 
     public TodoFragment() {
@@ -161,12 +161,8 @@ public class TodoFragment extends Fragment {
                 public void onClick(View view) {
                     DialogAddTask fragment = DialogAddTask.newInstance(repository.get(position));
                     fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
-                   fragment.show(getFragmentManager(), "tag7");
-                   if(change) {
-                       RepositoryToDo.getInstance(repository.get(position)).removeTask(position);
-                       adaptor.notifyDataSetChanged();
-                   }
-                   change=false;
+                    fragment.show(getFragmentManager(), "tag7");
+
 
                 }
             });
@@ -180,26 +176,37 @@ public class TodoFragment extends Fragment {
     }
 
     public void updateTask(TaskTodo task) {
-        change=true;
-        if (task.getTaskState() == States.TODO) {
-            repository.addTask(task);
 
+        if (task.getTaskState() == States.TODO) {
+            RepositoryToDo.getInstance(task).updateTask(task);
             adaptor.notifyDataSetChanged();
             if (repository.getTasks().size() > 0) {
                 backGroundLayout.setVisibility(View.INVISIBLE);
             }
+
         } else if (task.getTaskState() == States.DONE) {
+            repository.removeTask(task.getID());
+            adaptor.notifyDataSetChanged();
             RepositoryDone repositoryDone = RepositoryDone.getInstance(task);
+
             repositoryDone.addTask(task);
+            if (repository.getTasks().size() == 0) {
+                backGroundLayout.setVisibility(View.VISIBLE);
+            }
 
 
         } else if (task.getTaskState() == States.DOING) {
+            repository.removeTask(task.getID());
+            adaptor.notifyDataSetChanged();
             RepositoryDoing repositoryDoing = RepositoryDoing.getInstance(task);
             repositoryDoing.addTask(task);
+            if (repository.getTasks().size() == 0) {
+                backGroundLayout.setVisibility(View.VISIBLE);
+            }
 
 
         } else {
-            repository.addTask(task);
+            repository.updateTask(task);
             adaptor.notifyDataSetChanged();
             if (repository.getTasks().size() > 0) {
                 backGroundLayout.setVisibility(View.INVISIBLE);

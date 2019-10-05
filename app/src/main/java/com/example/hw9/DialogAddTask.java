@@ -75,15 +75,17 @@ public class DialogAddTask extends DialogFragment {
         addDate = v.findViewById(R.id.button_choose_date);
 
         task = (TaskTodo) getArguments().getSerializable(SENDED_TASK);
-        if (task.getDescription()!=null ||task.getTitle()!=null) {
+
+        if (task.getDescription() != null || task.getTitle() != null) {
             title.setText(task.getTitle());
             description.setText(task.getDescription());
             if (task.getTime() != null) {
-                addTime.setText(task.getTime().toString());
+                DateFormat format = new SimpleDateFormat("HH:mm");
 
+                addTime.setText(format.format(task.getTime()));
             }
             if (task.getDate() != null) {
-                addTime.setText(task.getDate().toString());
+                setTaskDate(task.getDate());
 
             }
 
@@ -142,6 +144,7 @@ public class DialogAddTask extends DialogFragment {
                     Fragment frg = getTargetFragment();
                     if (frg instanceof TodoFragment) {
                         TodoFragment todoFragment = (TodoFragment) getTargetFragment();
+
                         todoFragment.updateTask(task);
 
                     } else if (frg instanceof DoingFragment) {
@@ -153,9 +156,7 @@ public class DialogAddTask extends DialogFragment {
                     }
 
 
-                }
-
-                else if (title.getText().toString().isEmpty() || description.getText().toString().isEmpty()) {
+                } else if (title.getText().toString().isEmpty() || description.getText().toString().isEmpty()) {
                     Toast.makeText(getActivity(), "you can not have empty task", Toast.LENGTH_LONG).show();
 
                 }
@@ -163,7 +164,7 @@ public class DialogAddTask extends DialogFragment {
 
 
         });
-        builder.setNegativeButton("back",null);
+        builder.setNegativeButton("back", null);
 
 
         return builder.setView(v).create();
@@ -178,7 +179,7 @@ public class DialogAddTask extends DialogFragment {
 
     public void setTaskDate(Date date) {
         task.setDate(date);
-        DateFormat format = new SimpleDateFormat("yyyy:mm:d");
+        DateFormat format = new SimpleDateFormat("yyyy:MM:d");
         addDate.setText(format.format(task.getDate()));
     }
 

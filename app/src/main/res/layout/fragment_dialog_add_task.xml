@@ -40,27 +40,30 @@
 
     <RadioGroup
         android:id="@+id/radiogroop"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/editText_decription_dialog"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <RadioButton
             android:id="@+id/todoRadioBTN"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="TODO" />
 
         <RadioButton
             android:id="@+id/doingRadioButton"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="DOING" />
 
         <RadioButton
             android:id="@+id/doneRadioBTN"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="DONE" />
 
     </RadioGroup>
