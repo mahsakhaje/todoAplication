@@ -161,6 +161,9 @@ boolean change;
 
             RepositoryToDo repositoryTodo = RepositoryToDo.getInstance(task);
             repositoryTodo.addTask(task);
+            if (repository.getTasks().size() == 0) {
+                backGroundLayout.setVisibility(View.VISIBLE);
+            }
 
         } else if (task.getTaskState() == States.DONE) {
             repository.addTask(task);
@@ -171,6 +174,9 @@ boolean change;
         } else if (task.getTaskState() == States.DOING) {
             RepositoryDoing repositoryDoing = RepositoryDoing.getInstance(task);
             repositoryDoing.addTask(task);
+            if (repository.getTasks().size() == 0) {
+                backGroundLayout.setVisibility(View.VISIBLE);
+            }
 
 
         } else {

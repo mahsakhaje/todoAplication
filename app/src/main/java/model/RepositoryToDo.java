@@ -29,12 +29,27 @@ public class RepositoryToDo {
         return tasks.get(index);
     }
 
+    public TaskTodo getTask(UUID taskId){
+        for (TaskTodo task: tasks){
+            if (task.getID().equals(taskId))
+                return task;
+        }
+        return null;
+    }
+
     public void removeTask(UUID uuid) {
-       for (TaskTodo taskk:tasks){
-           if(taskk.getID()==uuid)
+       for (TaskTodo task:tasks){
+           if(task.getID().equals(uuid))
                tasks.remove(task);
        }
     }
+
+    public void updateTask(TaskTodo taskTodo){
+        removeTask(taskTodo.getID());
+        addTask(taskTodo);
+    }
+
+
     public void removeTask(int index){
         tasks.remove(index);
     }
