@@ -1,21 +1,21 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
 
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#AA93D5</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">#4EDBB9</item>
+        <item name="colorPrimaryDark">@color/colorTab</item>
         <item name="colorAccent">@color/colorAccent</item>
 
 
     </style>
     <style name="AppTheme.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar"
         ></style>
-    <style name="AppTheme.ActionBar.Text" parent="@android:style/TextAppearance">
-        <item name="android:textColor">#000</item>
+<!--    <style name="AppTheme.ActionBar.Text" parent="@android:style/TextAppearance">-->
+<!--        <item name="android:textColor">#000</item>-->
 
-    </style>
+<!--    </style>-->
     <style name="Widget.HW9.MaterialCardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardCornerRadius" >4dp</item>
 

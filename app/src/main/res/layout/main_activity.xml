@@ -11,9 +11,37 @@
     <com.google.android.material.tabs.TabLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/tab_background_color"
-        android:id="@+id/tab_layout"
-        ></com.google.android.material.tabs.TabLayout>
+android:background="@color/colorTab"
+
+        android:id="@+id/tab_layout">
+
+<!--        android:background="@drawable/tab_background_color"-->
+
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TODO"
+            android:id="@+id/tab1"
+            />
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DOING"
+            />
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DONE"
+            android:background="#000"
+            />
+
+    </com.google.android.material.tabs.TabLayout>
+
+<!--       -->
+
+
+
     <androidx.viewpager.widget.ViewPager
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

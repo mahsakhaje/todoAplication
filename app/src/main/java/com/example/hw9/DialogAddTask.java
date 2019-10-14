@@ -3,7 +3,7 @@ package com.example.hw9;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,25 +15,22 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Formatter;
 
-import model.RepositoryToDo;
-import model.TaskTodo;
+import model.Repository;
+import model.Task;
 
 
 public class DialogAddTask extends DialogFragment {
     public static final int REQUEST_CODE = 9;
-    TaskTodo task;
+    Task task;
     ViewPager viewPager;
     public static final String SENDED_TASK = "sended_task";
 
@@ -41,7 +38,7 @@ public class DialogAddTask extends DialogFragment {
         // Required empty public constructor
     }
 
-    public static DialogAddTask newInstance(TaskTodo task) {
+    public static DialogAddTask newInstance(Task task) {
 
         Bundle args = new Bundle();
         args.putSerializable(SENDED_TASK, task);
@@ -74,7 +71,7 @@ public class DialogAddTask extends DialogFragment {
         addTime = v.findViewById(R.id.button_choose_time);
         addDate = v.findViewById(R.id.button_choose_date);
 
-        task = (TaskTodo) getArguments().getSerializable(SENDED_TASK);
+        task = (Task) getArguments().getSerializable(SENDED_TASK);
 
         if (task.getDescription() != null || task.getTitle() != null) {
             title.setText(task.getTitle());
@@ -90,7 +87,7 @@ public class DialogAddTask extends DialogFragment {
             }
 
         } else {
-            task = new TaskTodo();
+            task = new Task();
         }
         addTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,14 +140,20 @@ public class DialogAddTask extends DialogFragment {
 
                     Fragment frg = getTargetFragment();
                     if (frg instanceof TodoFragment) {
-                        TodoFragment todoFragment = (TodoFragment) getTargetFragment();
 
+                        TodoFragment todoFragment = (TodoFragment) getTargetFragment();
+                        if (task.getTaskState() == null)
+                            task.setTaskState(States.TODO);
                         todoFragment.updateTask(task);
 
                     } else if (frg instanceof DoingFragment) {
+                        if (task.getTaskState() == null)
+                            task.setTaskState(States.DOING);
                         DoingFragment doing = (DoingFragment) getTargetFragment();
                         doing.updateTask(task);
                     } else if (frg instanceof DoneFragment) {
+                        if (task.getTaskState() == null)
+                            task.setTaskState(States.DONE);
                         DoneFragment done = (DoneFragment) getTargetFragment();
                         done.updateTask(task);
                     }
@@ -165,6 +168,19 @@ public class DialogAddTask extends DialogFragment {
 
         });
         builder.setNegativeButton("back", null);
+        builder.setNeutralButton("delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Repository.getInstance(task).removeTask(task.getID());
+                Fragment fragment = getTargetFragment();
+                if (fragment instanceof TodoFragment)
+                    ((TodoFragment) fragment).notifyAdapter();
+                else if (fragment instanceof DoingFragment)
+                    ((DoingFragment) fragment).notifyAdapter();
+                else if (fragment instanceof DoneFragment)
+                    ((DoneFragment) fragment).notifyAdapter();
+            }
+        });
 
 
         return builder.setView(v).create();

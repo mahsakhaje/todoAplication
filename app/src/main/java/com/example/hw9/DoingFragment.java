@@ -14,20 +14,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.tabs.TabLayout;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import model.RepositoryDoing;
-import model.RepositoryDone;
-import model.RepositoryToDo;
-import model.TaskTodo;
+import model.Repository;
+import model.Task;
 
 
 /**
@@ -38,11 +34,11 @@ public class DoingFragment extends Fragment {
     RecyclerView recyclerView;
     FloatingActionButton addTask;
     public static final int REQUEST_CODE = 2;
-    TaskTodo task;
+    Task task;
     MyAdapter adapter;
-    RepositoryDoing repository;
+    Repository repository;
     LinearLayout backGroundLayout;
-    boolean change;
+
 
     public DoingFragment() {
         // Required empty public constructor
@@ -66,10 +62,10 @@ public class DoingFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_todo, container, false);
         recyclerView = v.findViewById(R.id.todoRecycleerView);
         addTask = v.findViewById(R.id.addtodo_botton);
-        task = new TaskTodo();
+        task = new Task();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        repository = RepositoryDoing.getInstance(task);
-        adapter = new MyAdapter(repository.getTasks());
+        repository = Repository.getInstance(task);
+        adapter = new MyAdapter(repository.getDoingTasks());
         recyclerView.setAdapter(adapter);
         backGroundLayout = v.findViewById(R.id.linearlayot);
 
@@ -89,6 +85,8 @@ public class DoingFragment extends Fragment {
         TextView time;
         TextView description;
         LinearLayout linearLayout;
+        TextView firstLetter;
+        Task task;
 
         public ViewHolderDoing(@NonNull View itemView) {
             super(itemView);
@@ -97,14 +95,60 @@ public class DoingFragment extends Fragment {
             title = itemView.findViewById(R.id.textviewtitle_todo);
             description = itemView.findViewById(R.id.description_item_todo);
             linearLayout = itemView.findViewById(R.id.parent_layout);
+            firstLetter = itemView.findViewById(R.id.textView_FloatingTask);
+
         }
+
+        public void bind(final Task task) {
+            String textTime = "";
+            this.task = task;
+            title.setText(task.getTitle());
+            firstLetter.setText(task.getTitle().charAt(0) + "");
+            if (task.getTime() != null) {
+
+                Date date = task.getTime();
+                DateFormat format = new SimpleDateFormat("HH:mm");
+                textTime += format.format(date);
+                if (task.getDate() != null) {
+                    DateFormat formatDate = new SimpleDateFormat("yyyy:MM:dd");
+                    Date date1 = task.getDate();
+                    textTime += " at " + formatDate.format(date1);
+                }
+                time.setText(textTime);
+            } else if (task.getDate() != null) {
+                if (task.getTime() != null) {
+                    DateFormat formatDate = new SimpleDateFormat("HH:mm");
+                    Date date1 = task.getTime();
+                    textTime += formatDate.format(date1);
+                }
+                Date date = task.getDate();
+                DateFormat format = new SimpleDateFormat("yyyy:MM:dd");
+                textTime += " at " + format.format(date);
+
+                time.setText(textTime);
+            }
+
+            description.setText(task.getDescription());
+            linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogAddTask fragment = DialogAddTask.newInstance(task);
+                    fragment.setTargetFragment(DoingFragment.this, REQUEST_CODE);
+                    fragment.show(getFragmentManager(), "tag7");
+
+
+                }
+            });
+
+        }
+
     }
 
     public class MyAdapter extends RecyclerView.Adapter<ViewHolderDoing> {
-        List<TaskTodo> repositoryList;
+        List<Task> repositoryList;
 
 
-        MyAdapter(List<TaskTodo> repositoryList) {
+        MyAdapter(List<Task> repositoryList) {
 
             this.repositoryList = repositoryList;
         }
@@ -119,28 +163,7 @@ public class DoingFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolderDoing holder, final int position) {
-            holder.title.setText(repositoryList.get(position).getTitle());
-            if (repositoryList.get(position).getTime() != null) {
-                Date date = repositoryList.get(position).getTime();
-                DateFormat format = new SimpleDateFormat("HH:mm");
-                holder.time.setText(format.format(date));
-            }
-            holder.description.setText(repositoryList.get(position).getDescription());
-            holder.linearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DialogAddTask fragment = DialogAddTask.newInstance(repository.getTask(position));
-                    fragment.setTargetFragment(DoingFragment.this, REQUEST_CODE);
-                    fragment.show(getFragmentManager(), "tag21");
-                    if (change) {
-                        RepositoryDoing.getInstance(repository.getTask(position)).removeTask(position);
-                        adapter.notifyDataSetChanged();
-                    }
-                    change = false;
-
-                }
-
-            });
+            holder.bind(repositoryList.get(position));
 
 
         }
@@ -152,53 +175,52 @@ public class DoingFragment extends Fragment {
     }
 
 
-    public void updateTask(TaskTodo task) {
-        change = true;
+    public void updateTask(Task task) {
+
         if (task.getTaskState() == States.TODO) {
             repository.removeTask(task.getID());
-            adapter.notifyDataSetChanged();
-            RepositoryToDo repositoryTodo = RepositoryToDo.getInstance(task);
-            repositoryTodo.addTask(task);
-            if (repository.getTasks().size() == 0) {
-                backGroundLayout.setVisibility(View.VISIBLE);
-            }
+            notifyAdapter();
+            repository.addTask(task);
+            checkBackGround();
 
         } else if (task.getTaskState() == States.DONE) {
             repository.removeTask(task.getID());
-            adapter.notifyDataSetChanged();
-            RepositoryDone done = RepositoryDone.getInstance(task);
-            done.addTask(task);
-            if (repository.getTasks().size() == 0) {
-                backGroundLayout.setVisibility(View.VISIBLE);
-            }
+
+            repository.addTask(task);
+            checkBackGround();
+            notifyAdapter();
 
 
         } else if (task.getTaskState() == States.DOING) {
             repository.updateTask(task);
-            adapter.notifyDataSetChanged();
-            if (repository.getTasks().size() > 0) {
-                backGroundLayout.setVisibility(View.INVISIBLE);
-            }
+            notifyAdapter();
+            checkBackGround();
 
 
         } else {
             repository.updateTask(task);
-            adapter.notifyDataSetChanged();
-            if (repository.getTasks().size() > 0) {
-                backGroundLayout.setVisibility(View.INVISIBLE);
-            }
+            notifyAdapter();
+            checkBackGround();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (repository.getTasks() == null) {
-            return;
-        } else if (repository.getTasks().size() > 0) {
-            backGroundLayout.setVisibility(View.INVISIBLE);
-        }
 
+
+        checkBackGround();
+    }
+
+
+    public void notifyAdapter() {
+        adapter.notifyDataSetChanged();
+    }
+
+    public void checkBackGround() {
+        if (repository.getTodoTasks().size() > 0) {
+            backGroundLayout.setVisibility(View.INVISIBLE);
+        } else backGroundLayout.setVisibility(View.VISIBLE);
     }
 
 

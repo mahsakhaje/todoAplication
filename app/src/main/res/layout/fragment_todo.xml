@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backMain"
     tools:context=".TodoFragment"
-
 
     >
 
@@ -22,7 +23,7 @@
         <LinearLayout
             android:layout_width="149dp"
             android:layout_height="190dp"
-            android:background="@drawable/notebook"
+            android:background="@drawable/cropednotebook"
             android:orientation="horizontal">
 
         </LinearLayout>
@@ -51,11 +52,11 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
-
         android:layout_marginBottom="10dp"
         android:background="@drawable/add_task_fab_background_background"
+        android:src="@drawable/add_task_fab_background_foreground"
 
-        android:src="@drawable/add_task_fab_background_foreground"></com.google.android.material.floatingactionbutton.FloatingActionButton>
+        app:backgroundTint="@color/colorTab"></com.google.android.material.floatingactionbutton.FloatingActionButton>
 
 
 </RelativeLayout>

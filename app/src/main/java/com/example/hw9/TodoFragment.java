@@ -14,13 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextClock;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -30,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import model.RepositoryDoing;
-import model.RepositoryDone;
-import model.RepositoryToDo;
-import model.TaskTodo;
+import model.Repository;
+import model.Task;
 
 
 /**
@@ -41,17 +34,14 @@ import model.TaskTodo;
  */
 public class TodoFragment extends Fragment {
     public static final int REQUEST_CODE = 1;
-    TaskTodo task;
+    Task task;
     TextView title;
     TextView desc;
     RecyclerView myRecyclerView;
     MyAdaptor adaptor;
-    RepositoryToDo repository;
+    Repository repository;
     FloatingActionButton addTodoTask;
-    LinearLayout backGroundLayout;
-    boolean hide;
-    boolean change = false;
-
+    static LinearLayout backGroundLayout;
 
     public TodoFragment() {
         // Required empty public constructor
@@ -79,10 +69,10 @@ public class TodoFragment extends Fragment {
         myRecyclerView = v.findViewById(R.id.todoRecycleerView);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        task = new TaskTodo();
-        repository = RepositoryToDo.getInstance(task);
+        task = new Task();
+        repository = Repository.getInstance(task);
         backGroundLayout = v.findViewById(R.id.linearlayot);
-        adaptor = new MyAdaptor(repository.getTasks());
+        adaptor = new MyAdaptor(repository.getTodoTasks());
         myRecyclerView.setAdapter(adaptor);
 
         addTodoTask.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +94,8 @@ public class TodoFragment extends Fragment {
         TextView time;
         TextView description;
         LinearLayout linearLayout;
+        Task task;
+        TextView firstLetter;
 
         public MyViewHolder(@NonNull final View itemView) {
             super(itemView);
@@ -111,28 +103,62 @@ public class TodoFragment extends Fragment {
             title = itemView.findViewById(R.id.textviewtitle_todo);
             description = itemView.findViewById(R.id.description_item_todo);
             linearLayout = itemView.findViewById(R.id.parent_layout);
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                      DialogAddTask fragment = DialogAddTask.newInstance(task);
-//                    fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
-//                    fragment.show(getFragmentManager(), "tag7");
-//                }
-//            });
+            firstLetter = itemView.findViewById(R.id.textView_FloatingTask);
 
         }
+
+        public void bind(final Task task) {
+            String textTime = "";
+            this.task = task;
+            title.setText(task.getTitle());
+            char ch = task.getTitle().charAt(0);
+            firstLetter.setText(ch + "");
+            if (task.getTime() != null) {
+
+                Date date = task.getTime();
+                DateFormat format = new SimpleDateFormat("HH:mm");
+                textTime += format.format(date);
+                if (task.getDate() != null) {
+                    DateFormat formatDate = new SimpleDateFormat("yyyy:MM:dd");
+                    Date date1 = task.getDate();
+                    textTime += " at " + formatDate.format(date1);
+                }
+                time.setText(textTime);
+            } else if (task.getDate() != null) {
+                if (task.getTime() != null) {
+                    DateFormat formatDate = new SimpleDateFormat("HH:mm");
+                    Date date1 = task.getTime();
+                    textTime += formatDate.format(date1);
+                }
+                Date date = task.getDate();
+                DateFormat format = new SimpleDateFormat("yyyy:MM:dd");
+                textTime += " at " + format.format(date);
+
+                time.setText(textTime);
+            }
+
+            description.setText(task.getDescription());
+            linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogAddTask fragment = DialogAddTask.newInstance(task);
+                    fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
+                    fragment.show(getFragmentManager(), "tag7");
+
+
+                }
+            });
+
+        }
+
     }
 
     public class MyAdaptor extends RecyclerView.Adapter<MyViewHolder> {
 
-        List<TaskTodo> repository = new ArrayList<TaskTodo>();
-        private int index;
+        List<Task> repository = new ArrayList<Task>();
 
-        public int getIndex() {
-            return index;
-        }
 
-        MyAdaptor(List<TaskTodo> task) {
+        MyAdaptor(List<Task> task) {
             repository = task;
         }
 
@@ -140,32 +166,15 @@ public class TodoFragment extends Fragment {
         @Override
         public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.item_todo_layout, null, false);
-
-
             return new MyViewHolder(view);
         }
 
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
         @Override
         public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
-            index = position;
-            holder.title.setText(repository.get(position).getTitle());
-            if (repository.get(position).getTime() != null) {
-                Date date = repository.get(position).getTime();
-                DateFormat format = new SimpleDateFormat("HH:mm");
-                holder.time.setText(format.format(date));
-            }
-            holder.description.setText(repository.get(position).getDescription());
-            holder.linearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DialogAddTask fragment = DialogAddTask.newInstance(repository.get(position));
-                    fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
-                    fragment.show(getFragmentManager(), "tag7");
 
+            holder.bind(repository.get(position));
 
-                }
-            });
         }
 
 
@@ -175,42 +184,35 @@ public class TodoFragment extends Fragment {
         }
     }
 
-    public void updateTask(TaskTodo task) {
+
+    public void updateTask(Task task) {
+
 
         if (task.getTaskState() == States.TODO) {
-            RepositoryToDo.getInstance(task).updateTask(task);
-            adaptor.notifyDataSetChanged();
-            if (repository.getTasks().size() > 0) {
-                backGroundLayout.setVisibility(View.INVISIBLE);
-            }
-
+            Repository.getInstance(task).updateTask(task);
+            notifyAdapter();
+            checkBackGround();
         } else if (task.getTaskState() == States.DONE) {
             repository.removeTask(task.getID());
-            adaptor.notifyDataSetChanged();
-            RepositoryDone repositoryDone = RepositoryDone.getInstance(task);
+            notifyAdapter();
 
-            repositoryDone.addTask(task);
-            if (repository.getTasks().size() == 0) {
-                backGroundLayout.setVisibility(View.VISIBLE);
-            }
+            repository.addTask(task);
+            checkBackGround();
 
 
         } else if (task.getTaskState() == States.DOING) {
             repository.removeTask(task.getID());
-            adaptor.notifyDataSetChanged();
-            RepositoryDoing repositoryDoing = RepositoryDoing.getInstance(task);
-            repositoryDoing.addTask(task);
-            if (repository.getTasks().size() == 0) {
-                backGroundLayout.setVisibility(View.VISIBLE);
-            }
+            notifyAdapter();
+            repository.addTask(task);
+
+
+            checkBackGround();
 
 
         } else {
             repository.updateTask(task);
-            adaptor.notifyDataSetChanged();
-            if (repository.getTasks().size() > 0) {
-                backGroundLayout.setVisibility(View.INVISIBLE);
-            }
+            notifyAdapter();
+            checkBackGround();
         }
 
     }
@@ -218,11 +220,21 @@ public class TodoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (repository.getTasks() == null) {
-            return;
-        } else if (repository.getTasks().size() > 0) {
-            backGroundLayout.setVisibility(View.INVISIBLE);
-        }
+        checkBackGround();
 
+    }
+
+    public void notifyAdapter() {
+
+        adaptor.notifyDataSetChanged();
+        checkBackGround();
+
+
+    }
+
+    public void checkBackGround() {
+        if (repository.getTodoTasks().size() > 0) {
+            backGroundLayout.setVisibility(View.INVISIBLE);
+        } else backGroundLayout.setVisibility(View.VISIBLE);
     }
 }

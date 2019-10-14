@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -24,25 +23,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import model.RepositoryDoing;
-import model.RepositoryDone;
-import model.RepositoryToDo;
-import model.TaskTodo;
+import model.Repository;
+import model.Task;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class DoneFragment extends Fragment {
-    TaskTodo task;
+    Task task;
     RecyclerView recyclerView;
     FloatingActionButton addTask;
     public static final int REQUEST_CODE = 5;
 
     MyAdapter adapter;
-    RepositoryDone repository;
+    Repository repository;
     LinearLayout backGroundLayout;
-boolean change;
+
+
     public DoneFragment() {
         // Required empty public constructor
     }
@@ -64,12 +62,12 @@ boolean change;
         View v = inflater.inflate(R.layout.fragment_todo, container, false);
         recyclerView = v.findViewById(R.id.todoRecycleerView);
         Log.d(DoingFragment.TAG, "onCreateDone");
-        task = new TaskTodo();
+        task = new Task();
         addTask = v.findViewById(R.id.addtodo_botton);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        repository = RepositoryDone.getInstance(task);
+        repository = Repository.getInstance(task);
 
-        adapter = new MyAdapter(RepositoryDone.getInstance(task).getTasks());
+        adapter = new MyAdapter(Repository.getInstance(task).getDoneTasks());
         recyclerView.setAdapter(adapter);
         backGroundLayout = v.findViewById(R.id.linearlayot);
         addTask.setOnClickListener(new View.OnClickListener() {
@@ -90,20 +88,67 @@ boolean change;
         TextView time;
         TextView description;
         LinearLayout linearLayout;
+        TextView firstLetter;
+        Task task;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             time = itemView.findViewById(R.id.timeTextView_Item_View);
             title = itemView.findViewById(R.id.textviewtitle_todo);
             description = itemView.findViewById(R.id.description_item_todo);
-            linearLayout=itemView.findViewById(R.id.parent_layout);
+            linearLayout = itemView.findViewById(R.id.parent_layout);
+            firstLetter = itemView.findViewById(R.id.textView_FloatingTask);
         }
+
+        public void bind(final Task task) {
+            String textTime = "";
+            this.task = task;
+            title.setText(task.getTitle());
+            firstLetter.setText(task.getTitle().charAt(0) + "");
+            if (task.getTime() != null) {
+
+                Date date = task.getTime();
+                DateFormat format = new SimpleDateFormat("HH:mm");
+                textTime += format.format(date);
+                if (task.getDate() != null) {
+                    DateFormat formatDate = new SimpleDateFormat("yyyy:MM:dd");
+                    Date date1 = task.getDate();
+                    textTime += " at " + formatDate.format(date1);
+                }
+                time.setText(textTime);
+            } else if (task.getDate() != null) {
+                if (task.getTime() != null) {
+                    DateFormat formatDate = new SimpleDateFormat("HH:mm");
+                    Date date1 = task.getTime();
+                    textTime += formatDate.format(date1);
+                }
+                Date date = task.getDate();
+                DateFormat format = new SimpleDateFormat("yyyy:MM:dd");
+                textTime += " at " + format.format(date);
+
+                time.setText(textTime);
+            }
+
+            description.setText(task.getDescription());
+            linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogAddTask fragment = DialogAddTask.newInstance(task);
+                    fragment.setTargetFragment(DoneFragment.this, REQUEST_CODE);
+                    fragment.show(getFragmentManager(), "tag7");
+
+
+                }
+            });
+
+        }
+
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
-        List<TaskTodo> repositoryList;
+        List<Task> repositoryList;
 
-        MyAdapter(List<TaskTodo> repositoryList) {
+        MyAdapter(List<Task> repositoryList) {
 
             this.repositoryList = repositoryList;
         }
@@ -121,30 +166,7 @@ boolean change;
 
         @Override
         public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
-            holder.title.setText(repositoryList.get(position).getTitle());
-            holder.title.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-            if (repositoryList.get(position).getTime() != null) {
-                Date date = repositoryList.get(position).getTime();
-                DateFormat format = new SimpleDateFormat("HH:mm");
-                holder.time.setText(format.format(date));
-            }
-            holder.description.setText(repositoryList.get(position).getDescription());
-            holder.linearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DialogAddTask fragment = DialogAddTask.newInstance(repository.getTask(position));
-                    fragment.setTargetFragment(DoneFragment.this, REQUEST_CODE);
-                    fragment.show(getFragmentManager(), "tag9");
-                    if(change) {
-                        RepositoryDone.getInstance(repository.getTask(position)).removeTask(position);
-                        adapter.notifyDataSetChanged();
-                    }
-                    change=false;
-
-                }
-
-
-            });
+            holder.bind(repositoryList.get(position));
 
         }
 
@@ -155,47 +177,48 @@ boolean change;
         }
     }
 
-    public void updateTask(TaskTodo task) {
-        change=true;
+    public void updateTask(Task task) {
+
         if (task.getTaskState() == States.TODO) {
 
-            RepositoryToDo repositoryTodo = RepositoryToDo.getInstance(task);
-            repositoryTodo.addTask(task);
-            if (repository.getTasks().size() == 0) {
-                backGroundLayout.setVisibility(View.VISIBLE);
-            }
-
+            repository.removeTask(task.getID());
+            repository.addTask(task);
+            checkBackGround();
+            notifyAdapter();
         } else if (task.getTaskState() == States.DONE) {
             repository.addTask(task);
-            adapter.notifyDataSetChanged();
-            if (repository.getTasks().size() > 0) {
-                backGroundLayout.setVisibility(View.INVISIBLE);}
+            notifyAdapter();
+            checkBackGround();
 
         } else if (task.getTaskState() == States.DOING) {
-            RepositoryDoing repositoryDoing = RepositoryDoing.getInstance(task);
-            repositoryDoing.addTask(task);
-            if (repository.getTasks().size() == 0) {
-                backGroundLayout.setVisibility(View.VISIBLE);
-            }
-
+            repository.removeTask(task.getID());
+            repository.addTask(task);
+            notifyAdapter();
+            checkBackGround();
 
         } else {
             repository.addTask(task);
-            adapter.notifyDataSetChanged();
-            if (repository.getTasks().size() > 0) {
-                backGroundLayout.setVisibility(View.INVISIBLE);}
+            notifyAdapter();
+            checkBackGround();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (repository.getTasks() == null) {
-            return;
-        } else if (repository.getTasks().size() > 0) {
-            backGroundLayout.setVisibility(View.INVISIBLE);
-        }
+
+        checkBackGround();
+
 
     }
 
+    public void notifyAdapter() {
+        adapter.notifyDataSetChanged();
+    }
+
+    public void checkBackGround() {
+        if (repository.getDoneTasks().size() > 0) {
+            backGroundLayout.setVisibility(View.INVISIBLE);
+        } else backGroundLayout.setVisibility(View.VISIBLE);
+    }
 }

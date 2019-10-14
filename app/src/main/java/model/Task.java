@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-public class TaskTodo implements Serializable {
+public class Task implements Serializable {
     private String title;
     private String description;
     private Date date;
@@ -26,7 +26,7 @@ public class TaskTodo implements Serializable {
         return ID;
     }
 
-    public TaskTodo() {
+    public Task() {
         ID = UUID.randomUUID();
     }
 
