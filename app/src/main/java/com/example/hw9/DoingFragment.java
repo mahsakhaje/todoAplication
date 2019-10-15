@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import model.Repository;
 import model.Task;
 
 
@@ -178,15 +177,13 @@ public class DoingFragment extends Fragment {
     public void updateTask(Task task) {
 
         if (task.getTaskState() == States.TODO) {
-            repository.removeTask(task.getID());
+            repository.updateTask(task);
             notifyAdapter();
-            repository.addTask(task);
+
             checkBackGround();
 
         } else if (task.getTaskState() == States.DONE) {
-            repository.removeTask(task.getID());
-
-            repository.addTask(task);
+            repository.updateTask(task);
             checkBackGround();
             notifyAdapter();
 
@@ -215,10 +212,11 @@ public class DoingFragment extends Fragment {
 
     public void notifyAdapter() {
         adapter.notifyDataSetChanged();
+        checkBackGround();
     }
 
     public void checkBackGround() {
-        if (repository.getTodoTasks().size() > 0) {
+        if (repository.getDoingTasks().size() > 0) {
             backGroundLayout.setVisibility(View.INVISIBLE);
         } else backGroundLayout.setVisibility(View.VISIBLE);
     }

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import model.Repository;
 import model.Task;
 
 
@@ -189,21 +188,19 @@ public class TodoFragment extends Fragment {
 
 
         if (task.getTaskState() == States.TODO) {
-            Repository.getInstance(task).updateTask(task);
+            repository.updateTask(task);
             notifyAdapter();
             checkBackGround();
         } else if (task.getTaskState() == States.DONE) {
-            repository.removeTask(task.getID());
+            repository.updateTask(task);
             notifyAdapter();
 
-            repository.addTask(task);
             checkBackGround();
 
 
         } else if (task.getTaskState() == States.DOING) {
-            repository.removeTask(task.getID());
+            repository.updateTask(task);
             notifyAdapter();
-            repository.addTask(task);
 
 
             checkBackGround();

@@ -1,16 +1,18 @@
-package model;
-
-import com.example.hw9.States;
+package com.example.hw9;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import model.Task;
+import model.User;
+
 public class Repository {
     private Task task;
-    private List<Task> tasksTodo = new ArrayList<>();
-    private List<Task> tasksDoing = new ArrayList<>();
-    private List<Task> tasksDone = new ArrayList<>();
+    private List<Task> tasksTodo ;
+    private List<Task> tasksDoing ;
+    private List<Task> tasksDone ;
+
 
     private List<String[]> description;
     private static Repository instance;
@@ -71,9 +73,7 @@ public class Repository {
     }
 
 
-//    public void removeTask(int index){
-//        tasks.remove(index);
-//    }
+
 
     public List<Task> getTodoTasks() {
         return tasksTodo;

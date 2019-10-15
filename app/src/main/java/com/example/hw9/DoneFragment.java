@@ -1,7 +1,6 @@
 package com.example.hw9;
 
 
-import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import model.Repository;
 import model.Task;
 
 
@@ -31,10 +29,11 @@ import model.Task;
  * A simple {@link Fragment} subclass.
  */
 public class DoneFragment extends Fragment {
+    public static final String TAG_77 = "tag77";
     Task task;
     RecyclerView recyclerView;
     FloatingActionButton addTask;
-    public static final int REQUEST_CODE = 5;
+    public static final int REQUEST_CODE = 9;
 
     MyAdapter adapter;
     Repository repository;
@@ -135,7 +134,7 @@ public class DoneFragment extends Fragment {
                 public void onClick(View view) {
                     DialogAddTask fragment = DialogAddTask.newInstance(task);
                     fragment.setTargetFragment(DoneFragment.this, REQUEST_CODE);
-                    fragment.show(getFragmentManager(), "tag7");
+                    fragment.show(getFragmentManager(), TAG_77);
 
 
                 }
@@ -180,24 +179,23 @@ public class DoneFragment extends Fragment {
     public void updateTask(Task task) {
 
         if (task.getTaskState() == States.TODO) {
-
-            repository.removeTask(task.getID());
-            repository.addTask(task);
-            checkBackGround();
+            repository.updateTask(task);
             notifyAdapter();
+            checkBackGround();
+
         } else if (task.getTaskState() == States.DONE) {
-            repository.addTask(task);
+            repository.updateTask(task);
             notifyAdapter();
             checkBackGround();
 
         } else if (task.getTaskState() == States.DOING) {
-            repository.removeTask(task.getID());
-            repository.addTask(task);
+            repository.updateTask(task);
             notifyAdapter();
+
             checkBackGround();
 
         } else {
-            repository.addTask(task);
+            repository.updateTask(task);
             notifyAdapter();
             checkBackGround();
         }
@@ -214,6 +212,7 @@ public class DoneFragment extends Fragment {
 
     public void notifyAdapter() {
         adapter.notifyDataSetChanged();
+        checkBackGround();
     }
 
     public void checkBackGround() {

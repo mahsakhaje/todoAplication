@@ -25,12 +25,12 @@
                 android:layout_alignParentTop="true"
 
                 android:layout_centerInParent="true"
-                android:layout_centerHorizontal="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="21dp"
                 android:layout_toRightOf="@id/coordinator"
                 android:textColor="#000"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:fontFamily="casual" />
 
             <TextView
                 android:id="@+id/textviewtitle_todo"
@@ -44,14 +44,13 @@
                 android:textStyle="bold"
 
 
-                />
+                app:fontFamily="casual" />
 
             <TextView
                 android:id="@+id/description_item_todo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/coordinator"
-                android:layout_margin="5dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
@@ -63,7 +62,8 @@
                 android:hint="description : "
                 android:textColor="#000"
                 android:textSize="15sp"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                app:fontFamily="sans-serif" />
 
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:layout_width="wrap_content"

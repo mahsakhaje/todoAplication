@@ -32,7 +32,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="there is no task to show"
-            android:textColor="#000"></TextView>
+            android:textColor="#000"
+            app:fontFamily="casual"></TextView>
 
     </LinearLayout>
 
@@ -53,10 +54,9 @@
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/add_task_fab_background_background"
+
         android:src="@drawable/add_task_fab_background_foreground"
 
         app:backgroundTint="@color/colorTab"></com.google.android.material.floatingactionbutton.FloatingActionButton>
-
 
 </RelativeLayout>

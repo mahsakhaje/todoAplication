@@ -1,6 +1,7 @@
 package com.example.hw9;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -42,17 +43,37 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout.setupWithViewPager(mViewPager);
 
 
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                adaptor.notifyDataSetChanged();
+                if (position == 0) {
+                    TodoFragment frag = (TodoFragment) adaptor.getItem(0);
+                    frag.checkBackGround();
 
 
-        TabLayout.Tab tab1 = mTabLayout.getTabAt(0);
+                } else if (position == 1) {
+                    DoingFragment frag = (DoingFragment) adaptor.getItem(1);
+                    frag.checkBackGround();
 
-        tab1.setText("TODO");
 
-        TabLayout.Tab tab2 = mTabLayout.getTabAt(1);
-        tab2.setText("DOING");
+                } else if (position == 2) {
+                    DoneFragment frag = (DoneFragment) adaptor.getItem(2);
 
-        TabLayout.Tab tab3 = mTabLayout.getTabAt(2);
-        tab3.setText("DONE");
+                    frag.notifyAdapter();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
     }
 
@@ -82,7 +103,27 @@ public class MainActivity extends AppCompatActivity {
         public int getItemPosition(@NonNull Object object) {
             return POSITION_NONE;
         }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "TODO";
+
+                case 1:
+                    return "DOING";
+
+                case 2:
+                    return "DONE";
+
+                default:
+                    return "";
+            }
+
+        }
     }
+
 }
 
 
