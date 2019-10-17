@@ -1,9 +1,11 @@
 package com.example.hw9;
 
 
+import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.hw9.Repositories.TaskRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DateFormat;
@@ -36,7 +39,7 @@ public class DoneFragment extends Fragment {
     public static final int REQUEST_CODE = 9;
 
     MyAdapter adapter;
-    Repository repository;
+    TaskRepository taskRepository;
     LinearLayout backGroundLayout;
 
 
@@ -54,6 +57,12 @@ public class DoneFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        taskRepository=TaskRepository.getInstance(getActivity());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -61,19 +70,20 @@ public class DoneFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_todo, container, false);
         recyclerView = v.findViewById(R.id.todoRecycleerView);
         Log.d(DoingFragment.TAG, "onCreateDone");
-        task = new Task();
+
         addTask = v.findViewById(R.id.addtodo_botton);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        repository = Repository.getInstance(task);
 
-        adapter = new MyAdapter(Repository.getInstance(task).getDoneTasks());
+
+        adapter = new MyAdapter(TaskRepository.getInstance(getActivity()).getDoneTasks());
         recyclerView.setAdapter(adapter);
         backGroundLayout = v.findViewById(R.id.linearlayot);
+        final Task task=new Task();
         addTask.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                DialogAddTask fragment = DialogAddTask.newInstance(task);
+                DialogAddTask fragment = DialogAddTask.newInstance(task,false);
                 fragment.setTargetFragment(DoneFragment.this, REQUEST_CODE);
                 fragment.show(getFragmentManager(), "tag");
             }
@@ -94,6 +104,7 @@ public class DoneFragment extends Fragment {
             super(itemView);
             time = itemView.findViewById(R.id.timeTextView_Item_View);
             title = itemView.findViewById(R.id.textviewtitle_todo);
+
             description = itemView.findViewById(R.id.description_item_todo);
             linearLayout = itemView.findViewById(R.id.parent_layout);
             firstLetter = itemView.findViewById(R.id.textView_FloatingTask);
@@ -102,7 +113,8 @@ public class DoneFragment extends Fragment {
         public void bind(final Task task) {
             String textTime = "";
             this.task = task;
-            title.setText(task.getTitle());
+            title.setText(" "+task.getTitle()+" ");
+            title.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
             firstLetter.setText(task.getTitle().charAt(0) + "");
             if (task.getTime() != null) {
 
@@ -132,7 +144,7 @@ public class DoneFragment extends Fragment {
             linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    DialogAddTask fragment = DialogAddTask.newInstance(task);
+                    DialogAddTask fragment = DialogAddTask.newInstance(task,true);
                     fragment.setTargetFragment(DoneFragment.this, REQUEST_CODE);
                     fragment.show(getFragmentManager(), TAG_77);
 
@@ -146,6 +158,10 @@ public class DoneFragment extends Fragment {
 
     public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         List<Task> repositoryList;
+
+        public void setRepositoryList(List<Task> repositoryList) {
+            this.repositoryList = repositoryList;
+        }
 
         MyAdapter(List<Task> repositoryList) {
 
@@ -179,23 +195,23 @@ public class DoneFragment extends Fragment {
     public void updateTask(Task task) {
 
         if (task.getTaskState() == States.TODO) {
-            repository.updateTask(task);
+            taskRepository.updateTask(task);
             notifyAdapter();
             checkBackGround();
 
         } else if (task.getTaskState() == States.DONE) {
-            repository.updateTask(task);
+            taskRepository.addTask(task);
             notifyAdapter();
             checkBackGround();
 
         } else if (task.getTaskState() == States.DOING) {
-            repository.updateTask(task);
+            taskRepository.updateTask(task);
             notifyAdapter();
 
             checkBackGround();
 
         } else {
-            repository.updateTask(task);
+            taskRepository.updateTask(task);
             notifyAdapter();
             checkBackGround();
         }
@@ -211,13 +227,18 @@ public class DoneFragment extends Fragment {
     }
 
     public void notifyAdapter() {
+        adapter.setRepositoryList(taskRepository.getDoneTasks());
         adapter.notifyDataSetChanged();
         checkBackGround();
     }
 
     public void checkBackGround() {
-        if (repository.getDoneTasks().size() > 0) {
+        if (taskRepository.getDoneTasks().size() > 0) {
             backGroundLayout.setVisibility(View.INVISIBLE);
         } else backGroundLayout.setVisibility(View.VISIBLE);
+    }
+    public void addTask(Task task){
+        taskRepository.addTask(task);
+        notifyAdapter();
     }
 }

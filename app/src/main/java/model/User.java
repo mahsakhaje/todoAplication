@@ -13,7 +13,12 @@ public class User implements Serializable {
     }
 
     public User() {
-        id = UUID.randomUUID();
+        this(UUID.randomUUID());
+
+    }
+
+    public User(UUID id) {
+        this.id = id;
 
 
     }

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.hw9.Repositories.UserRepository;
 import com.google.android.material.snackbar.Snackbar;
 
 import model.User;
@@ -82,7 +83,7 @@ public class LoginFragment extends Fragment {
                         User user = new User();
                         user.setUserName(inputUserSended);
                         user.setPassword(inputPassSended);
-
+                        UserRepository.getInstance(getActivity()).addUser(user);
                         Intent intent = new Intent(getActivity(), MainActivity.class);
                         intent.putExtra("user",user);
                         startActivity(intent);

@@ -12,13 +12,13 @@ public class Task implements Serializable {
     private Date date;
     private Date time;
     private UUID ID;
-    private States taskState;
+    private String taskState;
 
-    public States getTaskState() {
+    public String getTaskState() {
         return taskState;
     }
 
-    public void setTaskState(States taskState) {
+    public void setTaskState(String taskState) {
         this.taskState = taskState;
     }
 
@@ -27,7 +27,11 @@ public class Task implements Serializable {
     }
 
     public Task() {
-        ID = UUID.randomUUID();
+        this(UUID.randomUUID());
+    }
+
+    public Task(UUID ID) {
+        this.ID = ID;
     }
 
     public String getTitle() {

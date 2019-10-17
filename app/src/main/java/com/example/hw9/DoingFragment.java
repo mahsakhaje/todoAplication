@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.hw9.Repositories.TaskRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DateFormat;
@@ -35,7 +36,7 @@ public class DoingFragment extends Fragment {
     public static final int REQUEST_CODE = 2;
     Task task;
     MyAdapter adapter;
-    Repository repository;
+    TaskRepository taskRepository;
     LinearLayout backGroundLayout;
 
 
@@ -61,17 +62,17 @@ public class DoingFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_todo, container, false);
         recyclerView = v.findViewById(R.id.todoRecycleerView);
         addTask = v.findViewById(R.id.addtodo_botton);
-        task = new Task();
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        repository = Repository.getInstance(task);
-        adapter = new MyAdapter(repository.getDoingTasks());
+        taskRepository = TaskRepository.getInstance(getActivity());
+        adapter = new MyAdapter(taskRepository.getDoingTasks());
         recyclerView.setAdapter(adapter);
         backGroundLayout = v.findViewById(R.id.linearlayot);
-
+        final Task task=new Task();
         addTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogAddTask fragment = DialogAddTask.newInstance(task);
+                DialogAddTask fragment = DialogAddTask.newInstance(task,false);
                 fragment.setTargetFragment(DoingFragment.this, REQUEST_CODE);
                 fragment.show(getFragmentManager(), "tag");
             }
@@ -131,7 +132,7 @@ public class DoingFragment extends Fragment {
             linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    DialogAddTask fragment = DialogAddTask.newInstance(task);
+                    DialogAddTask fragment = DialogAddTask.newInstance(task,true);
                     fragment.setTargetFragment(DoingFragment.this, REQUEST_CODE);
                     fragment.show(getFragmentManager(), "tag7");
 
@@ -146,6 +147,9 @@ public class DoingFragment extends Fragment {
     public class MyAdapter extends RecyclerView.Adapter<ViewHolderDoing> {
         List<Task> repositoryList;
 
+        public void setRepositoryList(List<Task> repositoryList) {
+            this.repositoryList = repositoryList;
+        }
 
         MyAdapter(List<Task> repositoryList) {
 
@@ -177,25 +181,26 @@ public class DoingFragment extends Fragment {
     public void updateTask(Task task) {
 
         if (task.getTaskState() == States.TODO) {
-            repository.updateTask(task);
+            taskRepository.addTask(task);
             notifyAdapter();
 
             checkBackGround();
 
         } else if (task.getTaskState() == States.DONE) {
-            repository.updateTask(task);
-            checkBackGround();
+            taskRepository.updateTask(task);
             notifyAdapter();
+            checkBackGround();
+
 
 
         } else if (task.getTaskState() == States.DOING) {
-            repository.updateTask(task);
+            taskRepository.updateTask(task);
             notifyAdapter();
             checkBackGround();
 
 
         } else {
-            repository.updateTask(task);
+            taskRepository.updateTask(task);
             notifyAdapter();
             checkBackGround();
         }
@@ -211,15 +216,19 @@ public class DoingFragment extends Fragment {
 
 
     public void notifyAdapter() {
+        adapter.setRepositoryList(taskRepository.getDoingTasks());
         adapter.notifyDataSetChanged();
         checkBackGround();
     }
 
     public void checkBackGround() {
-        if (repository.getDoingTasks().size() > 0) {
+        if (taskRepository.getDoingTasks().size() > 0) {
             backGroundLayout.setVisibility(View.INVISIBLE);
         } else backGroundLayout.setVisibility(View.VISIBLE);
     }
-
+    public void addTask(Task task){
+        taskRepository.addTask(task);
+        notifyAdapter();
+    }
 
 }

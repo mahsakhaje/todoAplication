@@ -19,6 +19,8 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.example.hw9.Repositories.TaskRepository;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,6 +30,7 @@ import model.Task;
 
 public class DialogAddTask extends DialogFragment {
     public static final int REQUEST_CODE = 9;
+    public static final String EDIT_CONDITION = "edit";
     Task task;
     ViewPager viewPager;
     public static final String SENDED_TASK = "sended_task";
@@ -36,12 +39,14 @@ public class DialogAddTask extends DialogFragment {
         // Required empty public constructor
     }
 
-    public static DialogAddTask newInstance(Task task) {
+    public static DialogAddTask newInstance(Task task, Boolean edit) {
 
         Bundle args = new Bundle();
         args.putSerializable(SENDED_TASK, task);
+        args.putBoolean(EDIT_CONDITION, edit);
         DialogAddTask fragment = new DialogAddTask();
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -63,6 +68,7 @@ public class DialogAddTask extends DialogFragment {
         doing = v.findViewById(R.id.doingRadioButton);
         todo = v.findViewById(R.id.todoRadioBTN);
         done = v.findViewById(R.id.doneRadioBTN);
+        final boolean edit = getArguments().getBoolean(EDIT_CONDITION);
         description = v.findViewById(R.id.editText_decription_dialog);
 
         viewPager = viewMain.findViewById(R.id.viewPagerContainor);
@@ -142,18 +148,24 @@ public class DialogAddTask extends DialogFragment {
                         TodoFragment todoFragment = (TodoFragment) getTargetFragment();
                         if (task.getTaskState() == null)
                             task.setTaskState(States.TODO);
-                        todoFragment.updateTask(task);
+                        if (edit)
+                            todoFragment.updateTask(task);
+                        else todoFragment.addTask(task);
 
                     } else if (frg instanceof DoingFragment) {
                         if (task.getTaskState() == null)
                             task.setTaskState(States.DOING);
                         DoingFragment doing = (DoingFragment) getTargetFragment();
-                        doing.updateTask(task);
+                        if (edit)
+                            doing.updateTask(task);
+                        else doing.addTask(task);
                     } else if (frg instanceof DoneFragment) {
                         if (task.getTaskState() == null)
                             task.setTaskState(States.DONE);
                         DoneFragment done = (DoneFragment) getTargetFragment();
-                        done.updateTask(task);
+                        if (edit)
+                            done.updateTask(task);
+                        else done.addTask(task);
                     }
 
 
@@ -169,7 +181,7 @@ public class DialogAddTask extends DialogFragment {
         builder.setNeutralButton("delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Repository.getInstance(task).removeTask(task.getID());
+                TaskRepository.getInstance(getActivity()).removeTask(task.getID());
                 Fragment fragment = getTargetFragment();
                 if (fragment instanceof TodoFragment)
                     ((TodoFragment) fragment).notifyAdapter();
