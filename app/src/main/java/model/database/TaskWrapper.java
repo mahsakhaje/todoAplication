@@ -23,7 +23,10 @@ public class TaskWrapper extends CursorWrapper {
         Long time = getLong(getColumnIndex(Schema.TaskTable.columns.TIME));
         String uuid = getString(getColumnIndex(Schema.TaskTable.columns.UUID));
         String state = getString(getColumnIndex(Schema.TaskTable.columns.STATE));
+      //  String userId=getString(getColumnIndex(Schema.TaskTable.columns.USERID));
+
         UUID uuid1 = UUID.fromString(uuid);
+      //  UUID userId1=UUID.fromString(userId);
         Date date1 = new Date(date);
         Date time1 = new Date(time);
         Task task = new Task(uuid1);
@@ -31,6 +34,7 @@ public class TaskWrapper extends CursorWrapper {
         task.setDescription(description);
         task.setDate(date1);
         task.setTime(time1);
+       // task.setUserId(userId1);
         if (state.equals("todo")) {
             task.setTaskState(States.TODO);
         } else if (state.equals("doing")) {

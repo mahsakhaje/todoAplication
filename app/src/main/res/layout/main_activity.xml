@@ -2,52 +2,50 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragmentsContainor"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
     android:orientation="vertical"
-    android:id="@+id/fragmentsContainor"
-    tools:ignore="MissingDefaultResource">
+    tools:context=".MainActivity">
+
     <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-android:background="@color/colorTab"
 
-        android:id="@+id/tab_layout">
+        android:background="@color/colorTab">
 
-<!--        android:background="@drawable/tab_background_color"-->
+
 
 
         <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TODO"
             android:id="@+id/tab1"
-            />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TODO" />
+
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DOING"
-            />
+            android:text="DOING" />
+
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DONE"
             android:background="#000"
-            />
+            android:text="DONE" />
 
     </com.google.android.material.tabs.TabLayout>
 
-<!--       -->
 
 
 
     <androidx.viewpager.widget.ViewPager
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/viewPagerContainor"
-        ></androidx.viewpager.widget.ViewPager>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+    </androidx.viewpager.widget.ViewPager>
 
 
 </LinearLayout>

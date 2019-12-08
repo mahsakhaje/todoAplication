@@ -6,12 +6,16 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -27,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import model.Task;
+import model.User;
 
 
 /**
@@ -34,6 +39,7 @@ import model.Task;
  */
 public class TodoFragment extends Fragment {
     public static final int REQUEST_CODE = 1;
+    public static final String USER_ = "user_";
     Task task;
     TextView title;
     TextView desc;
@@ -42,15 +48,17 @@ public class TodoFragment extends Fragment {
     TaskRepository taskRepository;
     FloatingActionButton addTodoTask;
     static LinearLayout backGroundLayout;
+    User user;
+    SearchView searchView;
 
     public TodoFragment() {
         // Required empty public constructor
     }
 
-    public static TodoFragment newInstance() {
+    public static TodoFragment newInstance(User user) {
 
         Bundle args = new Bundle();
-
+        args.putSerializable(USER_, user);
         TodoFragment fragment = new TodoFragment();
         fragment.setArguments(args);
 
@@ -68,8 +76,9 @@ public class TodoFragment extends Fragment {
         addTodoTask = (FloatingActionButton) v.findViewById(R.id.addtodo_botton);
         myRecyclerView = v.findViewById(R.id.todoRecycleerView);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
+        user = (User) getArguments().getSerializable(USER_);
         final Task task = new Task();
+        //  task.setUserId(user.getId());
         taskRepository = TaskRepository.getInstance(getActivity());
         backGroundLayout = v.findViewById(R.id.linearlayot);
         adaptor = new MyAdaptor(taskRepository.getTodoTasks());
@@ -78,15 +87,64 @@ public class TodoFragment extends Fragment {
         addTodoTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogAddTask fragment = DialogAddTask.newInstance(task,false);
+                DialogAddTask fragment = DialogAddTask.newInstance(task, false);
                 fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
                 fragment.show(getFragmentManager(), "tag");
 
             }
         });
+        notifyAdapter();
+        setHasOptionsMenu(true);
         return v;
     }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.my_menue, menu);
+        MenuItem search_item = menu.findItem(R.id.app_bar_search);
+        searchView = (SearchView) search_item.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adaptor.setTasks(taskRepository.searchTask(query, States.TODO));
+                adaptor.notifyDataSetChanged();
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adaptor.setTasks(taskRepository.searchTask(newText, States.TODO));
+                adaptor.notifyDataSetChanged();
+                // adaptor.notifyDataSetChanged();
+                return true;
+            }
+
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                notifyAdapter();
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.app_bar_search: {
+
+
+            }
+
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -141,7 +199,7 @@ public class TodoFragment extends Fragment {
             linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    DialogAddTask fragment = DialogAddTask.newInstance(task,true);
+                    DialogAddTask fragment = DialogAddTask.newInstance(task, true);
                     fragment.setTargetFragment(TodoFragment.this, REQUEST_CODE);
                     fragment.show(getFragmentManager(), "tag7");
 
@@ -194,8 +252,8 @@ public class TodoFragment extends Fragment {
 
         if (task.getTaskState() == States.TODO) {
 
-                taskRepository.updateTask(task);
-        ;
+            taskRepository.updateTask(task);
+
             notifyAdapter();
             checkBackGround();
 
@@ -244,8 +302,16 @@ public class TodoFragment extends Fragment {
             backGroundLayout.setVisibility(View.INVISIBLE);
         } else backGroundLayout.setVisibility(View.VISIBLE);
     }
-    public void addTask(Task task){
+
+    public void addTask(Task task) {
         taskRepository.addTask(task);
         notifyAdapter();
     }
+
+    public void notifyOnSearch() {
+        adaptor.setTasks(taskRepository.getTodoTasks());
+        adaptor.notifyDataSetChanged();
+
+    }
+
 }

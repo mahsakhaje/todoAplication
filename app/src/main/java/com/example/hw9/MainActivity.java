@@ -2,6 +2,7 @@ package com.example.hw9;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -15,11 +16,13 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.LinkedList;
 import java.util.List;
 
+import model.User;
+
 public class MainActivity extends AppCompatActivity {
     ViewPager mViewPager;
     TabLayout mTabLayout;
     myViewPager adaptor;
-
+    User user;
     List<Fragment> allFragments;
 
     private final int numberOfTabs = 3;
@@ -28,13 +31,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-
+        user = (User) getIntent().getSerializableExtra(LoginFragment.USER);
         mViewPager = findViewById(R.id.viewPagerContainor);
         mTabLayout = findViewById(R.id.tab_layout);
         allFragments = new LinkedList<Fragment>();
-        allFragments.add(TodoFragment.newInstance());
-        allFragments.add(DoingFragment.newInstance());
-        allFragments.add(DoneFragment.newInstance());
+        allFragments.add(TodoFragment.newInstance(user));
+        allFragments.add(DoingFragment.newInstance(user));
+        allFragments.add(DoneFragment.newInstance(user));
 
 
         adaptor = new myViewPager(getSupportFragmentManager());
@@ -54,12 +57,12 @@ public class MainActivity extends AppCompatActivity {
                 adaptor.notifyDataSetChanged();
                 if (position == 0) {
                     TodoFragment frag = (TodoFragment) adaptor.getItem(0);
-                    frag.checkBackGround();
+                    frag.notifyAdapter();
 
 
                 } else if (position == 1) {
                     DoingFragment frag = (DoingFragment) adaptor.getItem(1);
-                    frag.checkBackGround();
+                    frag.notifyAdapter();
 
 
                 } else if (position == 2) {

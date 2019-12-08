@@ -2,17 +2,30 @@ package model;
 
 import com.example.hw9.States;
 
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Property;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
 public class Task implements Serializable {
     private String title;
+
     private String description;
     private Date date;
     private Date time;
     private UUID ID;
     private String taskState;
+   // private UUID userId;
+
+//    public UUID getUserId() {
+//        return userId;
+//    }
+//
+//    public void setUserId(UUID userId) {
+//        this.userId = userId;
+//    }
 
     public String getTaskState() {
         return taskState;

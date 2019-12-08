@@ -26,6 +26,7 @@ import model.User;
 public class LoginFragment extends Fragment {
 
     public static final int REQUEST_CODE = 1;
+    public static final String USER = "user";
     Button mLogin, mSignUp;
     boolean setInSignUp = false;
     EditText mUserName, mPassword;
@@ -85,7 +86,7 @@ public class LoginFragment extends Fragment {
                         user.setPassword(inputPassSended);
                         UserRepository.getInstance(getActivity()).addUser(user);
                         Intent intent = new Intent(getActivity(), MainActivity.class);
-                        intent.putExtra("user",user);
+                        intent.putExtra(USER,user);
                         startActivity(intent);
 
                     } else {

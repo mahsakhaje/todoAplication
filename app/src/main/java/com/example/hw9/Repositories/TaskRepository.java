@@ -54,7 +54,7 @@ public class TaskRepository {
     public Task getTask(UUID taskId) {
 
         String[] selectionArgs = {"" + taskId.toString()};
-        TaskWrapper cursor = (TaskWrapper) queryTask(null, Schema.TaskTable.columns.UUID + " = ?", selectionArgs);
+        TaskWrapper cursor = (TaskWrapper) queryTask(null, Schema.TaskTable.columns.UUID + " =?", selectionArgs);
         try {
             cursor.moveToFirst();
             if (cursor == null || cursor.getCount() == 0)
@@ -77,20 +77,23 @@ public class TaskRepository {
 
                     String selection = Schema.TaskTable.columns.UUID + " = ?";
                     String[] selectionArgs = {uuid1};
-                    database.delete(Schema.TaskTable.TableName, selection, selectionArgs);
                     tasksTodo.remove(task);
+                    database.delete(Schema.TaskTable.TableName, selection, selectionArgs);
+
 
                 }
             }
         } else if (a.equals(States.DONE)) {
             for (Task task : tasksDone) {
                 if (task.getID().equals(uuid)) {
+                    tasksDone.remove(task);
                     String uuid1 = uuid.toString();
 
                     String selection = "UUID = ?";
-                    String[] selectionArgs = {"" + uuid1};
+                    String[] selectionArgs = { uuid1};
+
                     database.delete(Schema.TaskTable.TableName, selection, selectionArgs);
-                    tasksDone.remove(task);
+
 
                 }
             }
@@ -100,9 +103,9 @@ public class TaskRepository {
                     String uuid1 = uuid.toString();
 
                     String selection = "UUID = ?";
-                    String[] selectionArgs = {"" + uuid1};
-                    database.delete(Schema.TaskTable.TableName, selection, selectionArgs);
+                    String[] selectionArgs = {uuid1};
                     tasksDoing.remove(task);
+                    database.delete(Schema.TaskTable.TableName, selection, selectionArgs);
 
                 }
             }
@@ -236,6 +239,34 @@ public class TaskRepository {
 
 
         return false;
+    }
+
+    public List<Task> searchTask(String s, String states) {
+        List<Task> searchedTask = new ArrayList<>();
+        if (states.equals("todo")) {
+
+            for (Task task : getTodoTasks()) {
+                if (task.getTitle().contains(s)) {
+                    searchedTask.add(task);
+                }
+            }
+
+
+        }
+        else if(states.equals("doing")){
+            for(Task task:getDoingTasks()){
+                if(task.getTitle().contains(s))
+                    searchedTask.add(task);
+            }
+        }
+        else if(states.equals("done"))
+        {
+            for(Task task:getDoneTasks()){
+                if(task.getTitle().contains(s))
+                    searchedTask.add(task);
+            }
+        }
+        return searchedTask;
     }
 
 }

@@ -4,12 +4,16 @@ package com.example.hw9;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -24,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 import model.Task;
+import model.User;
 
 
 /**
@@ -31,23 +36,25 @@ import model.Task;
  */
 public class DoingFragment extends Fragment {
     public static final String TAG = "ACTIV";
+    public static final String USER__ = "user__";
     RecyclerView recyclerView;
     FloatingActionButton addTask;
     public static final int REQUEST_CODE = 2;
     Task task;
+    User user;
     MyAdapter adapter;
     TaskRepository taskRepository;
     LinearLayout backGroundLayout;
-
+    SearchView searchView;
 
     public DoingFragment() {
         // Required empty public constructor
     }
 
-    public static DoingFragment newInstance() {
+    public static DoingFragment newInstance(User user) {
 
         Bundle args = new Bundle();
-
+        args.putSerializable(USER__, user);
         DoingFragment fragment = new DoingFragment();
         fragment.setArguments(args);
         return fragment;
@@ -68,15 +75,20 @@ public class DoingFragment extends Fragment {
         adapter = new MyAdapter(taskRepository.getDoingTasks());
         recyclerView.setAdapter(adapter);
         backGroundLayout = v.findViewById(R.id.linearlayot);
-        final Task task=new Task();
+        final Task task = new Task();
+        user = (User) getArguments().getSerializable(USER__);
+        // task.setUserId(user.getId());
         addTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogAddTask fragment = DialogAddTask.newInstance(task,false);
+                DialogAddTask fragment = DialogAddTask.newInstance(task, false);
                 fragment.setTargetFragment(DoingFragment.this, REQUEST_CODE);
                 fragment.show(getFragmentManager(), "tag");
             }
         });
+        notifyAdapter();
+        setHasOptionsMenu(true);
+
         return v;
     }
 
@@ -132,7 +144,7 @@ public class DoingFragment extends Fragment {
             linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    DialogAddTask fragment = DialogAddTask.newInstance(task,true);
+                    DialogAddTask fragment = DialogAddTask.newInstance(task, true);
                     fragment.setTargetFragment(DoingFragment.this, REQUEST_CODE);
                     fragment.show(getFragmentManager(), "tag7");
 
@@ -147,14 +159,16 @@ public class DoingFragment extends Fragment {
     public class MyAdapter extends RecyclerView.Adapter<ViewHolderDoing> {
         List<Task> repositoryList;
 
-        public void setRepositoryList(List<Task> repositoryList) {
-            this.repositoryList = repositoryList;
-        }
+
 
         MyAdapter(List<Task> repositoryList) {
 
             this.repositoryList = repositoryList;
         }
+
+     public void setList(List<Task> list){
+            this.repositoryList=list;
+     }
 
         public ViewHolderDoing onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.item_todo_layout, null, false);
@@ -181,7 +195,7 @@ public class DoingFragment extends Fragment {
     public void updateTask(Task task) {
 
         if (task.getTaskState() == States.TODO) {
-            taskRepository.addTask(task);
+            taskRepository.updateTask(task);
             notifyAdapter();
 
             checkBackGround();
@@ -190,7 +204,6 @@ public class DoingFragment extends Fragment {
             taskRepository.updateTask(task);
             notifyAdapter();
             checkBackGround();
-
 
 
         } else if (task.getTaskState() == States.DOING) {
@@ -216,7 +229,7 @@ public class DoingFragment extends Fragment {
 
 
     public void notifyAdapter() {
-        adapter.setRepositoryList(taskRepository.getDoingTasks());
+        adapter.setList(taskRepository.getDoingTasks());
         adapter.notifyDataSetChanged();
         checkBackGround();
     }
@@ -226,9 +239,40 @@ public class DoingFragment extends Fragment {
             backGroundLayout.setVisibility(View.INVISIBLE);
         } else backGroundLayout.setVisibility(View.VISIBLE);
     }
-    public void addTask(Task task){
+
+    public void addTask(Task task) {
         taskRepository.addTask(task);
         notifyAdapter();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.my_menue, menu);
+        MenuItem search_item = menu.findItem(R.id.app_bar_search);
+        searchView = (SearchView) search_item.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.setList(taskRepository.searchTask(query, States.DOING));
+                adapter.notifyDataSetChanged();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+//              adapter.setList(taskRepository.searchTask(newText, States.DOING));
+//              adapter.notifyDataSetChanged();
+                return false;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                notifyAdapter();
+                return true;
+            }
+        });
     }
 
 }
